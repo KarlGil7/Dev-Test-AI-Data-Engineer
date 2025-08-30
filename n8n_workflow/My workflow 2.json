@@ -1,0 +1,815 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $json.downloadLink }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        -2048
+      ],
+      "id": "d41b6c17-e321-476c-934d-ae82689eb69a",
+      "name": "Get .csv",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.data && item.binary.data.fileName) {\n    item.json.myFileName = item.binary.data.fileName;\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        -2048
+      ],
+      "id": "55339369-c552-4eaf-9a82-f6f0aca33d71",
+      "name": "Save FileName from Binary"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        -2048
+      ],
+      "id": "d1da148a-1d5c-4276-8401-1b54ee22215a",
+      "name": "Convert to JSON"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d135f0ae-9670-49ae-9f53-a4ea0c180e9e",
+              "name": "load_date",
+              "value": "={{$now}}",
+              "type": "string"
+            },
+            {
+              "id": "7a2d05fa-4d6e-4cbd-a3a0-996422c5b6c3",
+              "name": "source_file_name",
+              "value": "={{ $('Save FileName from Binary').item.json.myFileName }}",
+              "type": "string"
+            },
+            {
+              "id": "bc84ffa0-1e42-4137-a62d-dd30ffbe1e3e",
+              "name": "id",
+              "value": "={{$itemIndex + 1}}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2528,
+        -2048
+      ],
+      "id": "2589e141-33ba-4d2e-99f7-830975a00c76",
+      "name": "Add source_file_name & load_date"
+    },
+    {
+      "parameters": {
+        "jsCode": "const itemsOut = [];\n\n\n    const originalLink = $input.first().json.link;\n\n    // Extraemos el ID del link correctamente (después de /d/)\n    const match = originalLink.match(/\\/d\\/(.*?)\\/view/);\n    let downloadLink = \"\";\n    if (match && match[1]) {\n        const fileId = match[1];\n        downloadLink = `https://drive.google.com/uc?export=download&id=${fileId}`;\n    \n\n    // Guardamos en json para el siguiente nodo\n    itemsOut.push({\n        json: {\n            originalLink,\n            downloadLink\n        }\n    });\n}\n\nreturn itemsOut;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -2048
+      ],
+      "id": "1ac6ded1-250b-4b0f-9b65-b1cd88369b3e",
+      "name": "Adapt Download link1"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ads_spend",
+          "mode": "list",
+          "cachedResultName": "ads_spend"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "spend": "={{ $json.spend }}",
+            "clicks": "={{ $json.clicks }}",
+            "impressions": "={{ $json.impressions }}",
+            "conversions": "={{ $json.conversions }}",
+            "id": "={{ $json.id }}",
+            "platform": "={{ $json.platform }}",
+            "date": "={{ $json.date }}",
+            "account": "={{ $json.account }}",
+            "campaign": "={{ $json.campaign }}",
+            "country": "={{ $json.country }}",
+            "device": "={{ $json.device }}",
+            "load_date": "={{ $json.load_date }}",
+            "source_file_name": "={{ $json.source_file_name }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "campaign",
+              "displayName": "campaign",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "device",
+              "displayName": "device",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "spend",
+              "displayName": "spend",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "clicks",
+              "displayName": "clicks",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "impressions",
+              "displayName": "impressions",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "conversions",
+              "displayName": "conversions",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "load_date",
+              "displayName": "load_date",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "source_file_name",
+              "displayName": "source_file_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2928,
+        -2048
+      ],
+      "id": "2edbf241-d522-48b5-bb29-fc2c5379c5b6",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "2XYsGcVNRACAbc8X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Part 1 – Ingestion (Foundation)\n**Here, it's necessary to adapt the download link, get .CSV file, save filename, convert to JSON, add required fields and insert or update into Supabase Postgress Database**\n\n**Double click** to check it. [Guide](https://docs.google.com/document/d/18mDSH1aztutFJA4pSwFXh7SJij1HZlik9tjSVw2_fgI/edit?tab=t.0)\n\n",
+        "height": 304,
+        "width": 2064
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -2160
+      ],
+      "id": "5df5ff34-3197-4950-ab30-eba65d3829ad",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Part 2 – KPI Modeling (SQL)\n**Here is the logic of apply sql queries, get metrics, generate graph, generate .xlsx file, upload that file to Supabase and retorn JSON\ni.e:\n{   \"chartUrl\": \"https://quickchart.io/ch...\",\n    \"last_spend\": 286444.81,\n    \"prior_spend\": 284236.72,\n    \"spend_delta_pct\": 0.78,\n    \"last_30_cac\": 31.1,\n    \"prior_30_cac\": 30.64,\n    \"last_30_roas\": 3.22,\n    \"prior_30_roas\": 3.26,\n    \"URL_file\": \"https://bdmvhhrikhkmjitonnlj.supabase.co/storage/v1/object/public-bucket/KPI Modelling_2025-08-29T20:36:43.461-06:00.xlsx\"}**\n\n\n**Double click** to check it. [Guide](https://docs.google.com/document/d/18mDSH1aztutFJA4pSwFXh7SJij1HZlik9tjSVw2_fgI/edit?tab=t.0)\n\n\n\n\n",
+        "height": 672,
+        "width": 1296
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        -1776
+      ],
+      "id": "51217626-65ef-4061-8c17-de13e7abb5e5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "path": "my-hook-spends",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        -1536
+      ],
+      "id": "59888adc-a989-4379-8005-e17e875a98b1",
+      "name": "Webhook",
+      "webhookId": "081da772-db5c-452c-85bd-22a9b829e30d",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"BadRequest\": \"Sorry, Can you rewrite your question, please?\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        688,
+        -1520
+      ],
+      "id": "e955f2c7-844e-4f2a-93e0-89b52bd362b7",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -1520
+      ],
+      "id": "46cb9103-36ae-4f81-abb5-01c82eb054f6",
+      "name": "No Operation"
+    },
+    {
+      "parameters": {
+        "content": "\n## Part 3 – Analyst Access\nHere, I consider two branches:\n1. Analyst Process: User can entry 'startdate' and 'endate' parameters into the API, so can consult metrics either a date range and the metrics of prior days. i.e (30vs30, 50vs50,etc)\n2. Pivot Date Process: User can entry only 'startdate' parameter into the API, so will compare last 30 days vs prior 30 days.\n\n**Double click** to check it. [Guide](https://docs.google.com/document/d/18mDSH1aztutFJA4pSwFXh7SJij1HZlik9tjSVw2_fgI/edit?tab=t.0)",
+        "height": 672,
+        "width": 752
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -1776
+      ],
+      "id": "b4109ef4-bf73-4795-a83a-6e9c7a6cdc35",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "81536958-a3b7-4f88-98a6-65726051308f",
+              "leftValue": "={{ $('Verify Cases').item.json.flowFlag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        -1456
+      ],
+      "id": "1bdb2282-77fb-4c38-a4c9-da3af3653cf3",
+      "name": "If",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "499ab182-35dd-46ad-b3c8-79f5361c857d",
+              "leftValue": "={{ $json.flowFlag }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        -1536
+      ],
+      "id": "b6a1875b-b135-4c87-8422-d82ae3b0b3f7",
+      "name": "Is Zero?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nodo Function en n8n\nreturn items.map(item => {\n  const question = $input.first().json.query.question; // La pregunta viene en item.json.question\n  let start = null;\n  let end = null;\n  const link = \"https://drive.google.com/file/d/1RXj_3txgmyX2Wyt9ZwM7l4axfi5A6EC-/view\";\n  let flowFlag = 0; // Valor por defecto\n\n  // Caso 1 y 2: preguntas de tipo CAC y ROAS\n  if (question.startsWith(\"Compare CAC and ROAS for last 30 days vs prior 30 days\")) {\n      flowFlag = 2;\n\n      // Ver si tiene una fecha al final después de coma\n      const dateMatch = question.match(/,\\s*(\\d{4}-\\d{2}-\\d{2})$/);\n      if (dateMatch) {\n          start = dateMatch[1]; // Fecha extraída\n      } else {\n          start = new Date().toISOString().slice(0, 10); // Fecha actual YYYY-MM-DD\n      }\n  } else {\n      // Caso rango de fechas: \"Metrics from YYYY-MM-DD to YYYY-MM-DD\"\n      const match = question.match(/Metrics from (\\d{4}-\\d{2}-\\d{2}) to (\\d{4}-\\d{2}-\\d{2})/);\n      if (match) {\n          flowFlag = 1;\n          start = match[1];\n          end = match[2];\n      }\n  }\n\n  // Retornar el item con las nuevas variables\n  return {\n    json: {\n      question,\n      flowFlag,\n      start,\n      end,\n      link\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -1536
+      ],
+      "id": "c0e3174a-67b0-4292-83b4-a1ad4c67c3e1",
+      "name": "Verify Cases"
+    },
+    {
+      "parameters": {
+        "content": "↑\n**True = Analyst process\nFalse = Pivot Date Process** ",
+        "height": 128,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -1296
+      ],
+      "id": "1f6a6ae1-3b5c-4ed7-9776-c46744a11a51",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nWITH params AS (\n    SELECT '{{ $('Verify Cases').item.json.start }}'::date AS pivot_date\n),\nlast_30_days AS (\n    SELECT\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions)*100 AS revenue\n    FROM ads_spend, params\n    WHERE date >= pivot_date - INTERVAL '29 days'\n      AND date <= pivot_date\n),\nprior_30_days AS (\n    SELECT\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions)*100 AS revenue\n    FROM ads_spend, params\n    WHERE date >= pivot_date - INTERVAL '59 days'\n      AND date <= pivot_date - INTERVAL '30 days'\n)\nSELECT\n    l.spend AS last_30_spend,\n    p.spend AS prior_30_spend,\n    ROUND(((l.spend - p.spend)/NULLIF(p.spend,0))*100,2) AS spend_delta_pct,\n    ROUND(l.spend::numeric / NULLIF(l.conversions,0),2) AS last_30_cac,\n    ROUND(p.spend::numeric / NULLIF(p.conversions,0),2) AS prior_30_cac,\n    ROUND(l.revenue::numeric / NULLIF(l.spend,0),2) AS last_30_roas,\n    ROUND(p.revenue::numeric / NULLIF(p.spend,0),2) AS prior_30_roas\nFROM last_30_days l\nCROSS JOIN prior_30_days p;",
+        "options": {
+          "queryBatching": "single"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1936,
+        -1296
+      ],
+      "id": "557f2f01-a4f0-4519-bb59-ae6104b216f6",
+      "name": "Compare last 30 days vs prior 30 days",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "2XYsGcVNRACAbc8X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH params AS (\n    SELECT \n        '{{ $('Verify Cases').item.json.start }}'::date AS start_date,\n        '{{ $('Verify Cases').item.json.end }}'::date AS end_date,\n        -- Calcular duración del rango en días\n        ( '{{ $('Verify Cases').item.json.end }}'::date - '{{ $('Verify Cases').item.json.start }}'::date + 1 ) AS range_days\n),\nlast_period AS (\n    SELECT\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions)*100 AS revenue\n    FROM ads_spend, params\n    WHERE date >= start_date\n      AND date <= end_date\n),\nprior_period AS (\n    SELECT\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions)*100 AS revenue\n    FROM ads_spend, params\n    WHERE date >= start_date - range_days\n      AND date < start_date\n)\nSELECT\n    l.spend AS last_period_spend,\n    p.spend AS prior_period_spend,\n    ROUND(((l.spend - p.spend)/NULLIF(p.spend,0))*100,2) AS spend_delta_pct,\n    ROUND(l.spend::numeric / NULLIF(l.conversions,0),2) AS last_period_cac,\n    ROUND(p.spend::numeric / NULLIF(p.conversions,0),2) AS prior_period_cac,\n    ROUND(l.revenue::numeric / NULLIF(l.spend,0),2) AS last_period_roas,\n    ROUND(p.revenue::numeric / NULLIF(p.spend,0),2) AS prior_period_roas\n   \nFROM last_period l\nCROSS JOIN prior_period p\nCROSS JOIN params;\n",
+        "options": {
+          "queryBatching": "single"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1632,
+        -1488
+      ],
+      "id": "eaaae35c-701a-4492-b258-3fafc22c721d",
+      "name": "Data Range Metrics",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "2XYsGcVNRACAbc8X",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "fileFormat": "xlsx",
+        "options": {
+          "fileName": "=KPI Modelling_{{$now}}.xlsx"
+        }
+      },
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        -1408
+      ],
+      "id": "4900de9a-6841-4d21-a9ab-44f3e3fc67a9"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"chartUrl\": \"{{ $('Customize Graph').item.json.chartUrl }}\",\n  \"last_spend\": {{ $('Customize Graph').item.json.last_spend }},\n  \"prior_spend\": {{ $('Customize Graph').item.json.prior_spend }},\n  \"spend_delta_pct\": {{ $('Customize Graph').item.json.spend_delta }},\n  \"last_30_cac\": {{ $('Customize Graph').item.json.last_30_cac }},\n  \"prior_30_cac\": {{ $('Customize Graph').item.json.prior_30_cac }},\n  \"last_30_roas\": {{ $('Customize Graph').item.json.last_30_roas }},\n  \"prior_30_roas\": {{ $('Customize Graph').item.json.prior_30_roas }},\n\"URL_file\": \"https://bdmvhhrikhkmjitonnlj.supabase.co/storage/v1/object/{{ $json.body.Key }}\"\n}\n",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Respond to Webhook2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2928,
+        -1408
+      ],
+      "id": "352f59b9-c05c-4ba1-b102-8d97df326bac"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://bdmvhhrikhkmjitonnlj.supabase.co/storage/v1/object/public-bucket/{{ $binary.data.fileName }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2672,
+        -1408
+      ],
+      "id": "881e312a-9b9d-4534-8d0e-87c1ef690126",
+      "name": "HTTP Request",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TFi860cuscgqRTv7",
+          "name": "Supabase account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sourceData = items[0].json; // toma el primer item de input directo\n\nconst chartConfig = {\n  type: 'bar',\n  data: {\n    labels: ['last_30_cac', 'prior_30_cac', 'last_30_roas', 'prior_30_roas'],\n    datasets: [\n      {\n        label: 'Results',\n        data: [\n          sourceData.last_30_cac ?? sourceData.last_period_cac,\n          sourceData.prior_30_cac ?? sourceData.prior_period_cac,\n          sourceData.last_30_roas ?? sourceData.last_period_roas,\n          sourceData.prior_30_roas ?? sourceData.prior_period_roas\n        ],\n        backgroundColor: ['#FF6384', '#36A2EB', '#56A1EB', '#26A9EB']\n      }\n    ]\n  },\n  options: {\n    scales: {\n      y: { beginAtZero: true }\n    }\n  }\n};\n\nconst quickChartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}`;\n\nreturn [\n  {\n    json: {\n      chartUrl: quickChartUrl,\n      last_spend: sourceData.last_30_spend ?? sourceData.last_period_spend,\n      prior_spend: sourceData.prior_30_spend ?? sourceData.prior_period_spend,\n      spend_delta: sourceData.spend_delta_pct ?? sourceData.spend_delta,\n      last_30_cac: sourceData.last_30_cac ?? sourceData.last_period_cac,\n      prior_30_cac: sourceData.prior_30_cac ?? sourceData.prior_period_cac,\n      last_30_roas: sourceData.last_30_roas ?? sourceData.last_period_roas,\n      prior_30_roas: sourceData.prior_30_roas ?? sourceData.prior_period_roas\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        -1408
+      ],
+      "id": "8261027c-2713-437e-858f-d174bf7a2702",
+      "name": "Customize Graph"
+    },
+    {
+      "parameters": {
+        "content": "↑\n## Part 4 – Agent Demo (Bonus, Optional)\nThe agent, consider two sentences:\n1. Compare CAC and ROAS for last 30 days vs prior 30 days:  The agent will compare last 30 days vs prior 30 days and get metrics taking the current day as pivot date.\n2. Get metrics from [date1] to [date2]: The agent will get metrics into that data range.\n\n**Double click** to check it. [Guide](https://docs.google.com/document/d/18mDSH1aztutFJA4pSwFXh7SJij1HZlik9tjSVw2_fgI/edit?tab=t.0)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nExample:\n**https://cgil7.app.n8n.cloud/webhook/my-hook-spends?question=Compare CAC and ROAS for last 30 days vs prior 30 days,2025-03-01**\nIf the question doesn't contain the date at the end, the comparison occurs considering the current date of this consult. Check if your dataset has enough dates.\n\n**https://cgil7.app.n8n.cloud/webhook/my-hook-spends?question=Metrics from 2025-02-01 to 2025-03-01**\nThis question gets the metrics in a data range specified and also compare to prior days too. \nFor example, if your range is from 2025-02-01 to 2025-03-01, that is 32 days. Then the prior_period would be the 32 days immediately prior. 32 vs 32, etc...",
+        "height": 672,
+        "width": 1248
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -1776
+      ],
+      "id": "3b8ed279-ee4e-404e-b432-e7d492914c30",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get .csv": {
+      "main": [
+        [
+          {
+            "node": "Save FileName from Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save FileName from Binary": {
+      "main": [
+        [
+          {
+            "node": "Convert to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to JSON": {
+      "main": [
+        [
+          {
+            "node": "Add source_file_name & load_date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt Download link1": {
+      "main": [
+        [
+          {
+            "node": "Get .csv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add source_file_name & load_date": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "No Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Zero?": {
+      "main": [
+        [
+          {
+            "node": "Adapt Download link1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Cases": {
+      "main": [
+        [
+          {
+            "node": "Is Zero?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Data Range Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Compare last 30 days vs prior 30 days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare last 30 days vs prior 30 days": {
+      "main": [
+        [
+          {
+            "node": "Customize Graph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Range Metrics": {
+      "main": [
+        [
+          {
+            "node": "Customize Graph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadsheet File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook2": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customize Graph": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "249427a1-ae5a-4b47-860e-8af817c12385",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "46a0c3bdcd146b24d3026db29b222dfab874156ae67c6ff82df73b70a96c8745"
+  },
+  "id": "5CZ0APkze0N6iLxJ",
+  "tags": []
+}

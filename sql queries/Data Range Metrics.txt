@@ -1,0 +1,37 @@
+WITH params AS (
+    SELECT 
+        '{{ $('Verify Cases').item.json.start }}'::date AS start_date,
+        '{{ $('Verify Cases').item.json.end }}'::date AS end_date,
+        -- Calcular duración del rango en días
+        ( '{{ $('Verify Cases').item.json.end }}'::date - '{{ $('Verify Cases').item.json.start }}'::date + 1 ) AS range_days
+),
+last_period AS (
+    SELECT
+        SUM(spend) AS spend,
+        SUM(conversions) AS conversions,
+        SUM(conversions)*100 AS revenue
+    FROM ads_spend, params
+    WHERE date >= start_date
+      AND date <= end_date
+),
+prior_period AS (
+    SELECT
+        SUM(spend) AS spend,
+        SUM(conversions) AS conversions,
+        SUM(conversions)*100 AS revenue
+    FROM ads_spend, params
+    WHERE date >= start_date - range_days
+      AND date < start_date
+)
+SELECT
+    l.spend AS last_period_spend,
+    p.spend AS prior_period_spend,
+    ROUND(((l.spend - p.spend)/NULLIF(p.spend,0))*100,2) AS spend_delta_pct,
+    ROUND(l.spend::numeric / NULLIF(l.conversions,0),2) AS last_period_cac,
+    ROUND(p.spend::numeric / NULLIF(p.conversions,0),2) AS prior_period_cac,
+    ROUND(l.revenue::numeric / NULLIF(l.spend,0),2) AS last_period_roas,
+    ROUND(p.revenue::numeric / NULLIF(p.spend,0),2) AS prior_period_roas
+   
+FROM last_period l
+CROSS JOIN prior_period p
+CROSS JOIN params;

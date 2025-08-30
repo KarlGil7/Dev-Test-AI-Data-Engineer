@@ -1,0 +1,32 @@
+
+WITH params AS (
+    SELECT '{{ $('Verify Cases').item.json.start }}'::date AS pivot_date
+),
+last_30_days AS (
+    SELECT
+        SUM(spend) AS spend,
+        SUM(conversions) AS conversions,
+        SUM(conversions)*100 AS revenue
+    FROM ads_spend, params
+    WHERE date >= pivot_date - INTERVAL '29 days'
+      AND date <= pivot_date
+),
+prior_30_days AS (
+    SELECT
+        SUM(spend) AS spend,
+        SUM(conversions) AS conversions,
+        SUM(conversions)*100 AS revenue
+    FROM ads_spend, params
+    WHERE date >= pivot_date - INTERVAL '59 days'
+      AND date <= pivot_date - INTERVAL '30 days'
+)
+SELECT
+    l.spend AS last_30_spend,
+    p.spend AS prior_30_spend,
+    ROUND(((l.spend - p.spend)/NULLIF(p.spend,0))*100,2) AS spend_delta_pct,
+    ROUND(l.spend::numeric / NULLIF(l.conversions,0),2) AS last_30_cac,
+    ROUND(p.spend::numeric / NULLIF(p.conversions,0),2) AS prior_30_cac,
+    ROUND(l.revenue::numeric / NULLIF(l.spend,0),2) AS last_30_roas,
+    ROUND(p.revenue::numeric / NULLIF(p.spend,0),2) AS prior_30_roas
+FROM last_30_days l
+CROSS JOIN prior_30_days p;

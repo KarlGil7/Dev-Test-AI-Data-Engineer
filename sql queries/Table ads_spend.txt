@@ -1,0 +1,15 @@
+CREATE TABLE public.ads_spend (
+    date date NOT NULL,
+    platform varchar(50) NOT NULL,
+    account varchar(100) NOT NULL,
+    campaign varchar(150) NOT NULL,
+    country varchar(10) NOT NULL,
+    device varchar(50) NOT NULL,
+    spend numeric(12,2) NOT NULL,
+    clicks integer NOT NULL,
+    impressions integer NOT NULL,
+    conversions integer NOT NULL,
+    load_date timestamptz NOT NULL,
+    source_file_name varchar(255) NOT NULL,
+    id bigserial PRIMARY KEY
+);

@@ -1,0 +1,47 @@
+{
+	"info": {
+		"_postman_id": "081eff33-6a07-4161-bee3-52759cf6b3dc",
+		"name": "DEV TEST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43698398",
+		"_collection_link": "https://carlosgil-6557405.postman.co/workspace/Carlos-Gil's-Workspace~fa7bdf50-4818-499e-8cf7-ecd4842e774f/collection/43698398-081eff33-6a07-4161-bee3-52759cf6b3dc?action=share&source=collection_link&creator=43698398"
+	},
+	"item": [
+		{
+			"name": "Consume API n8n",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://cgil7.app.n8n.cloud/webhook/my-hook-spends?question=Compare CAC and ROAS for last 30 days vs prior 30 days",
+					"protocol": "https",
+					"host": [
+						"cgil7",
+						"app",
+						"n8n",
+						"cloud"
+					],
+					"path": [
+						"webhook",
+						"my-hook-spends"
+					],
+					"query": [
+						{
+							"key": "question",
+							"value": "Compare CAC and ROAS for last 30 days vs prior 30 days"
+						},
+						{
+							"key": "question",
+							"value": "Metrics from 2025-02-01 to 2025-03-01",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
